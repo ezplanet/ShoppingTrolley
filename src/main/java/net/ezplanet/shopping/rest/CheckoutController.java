@@ -24,6 +24,8 @@ import net.ezplanet.shopping.data.ProductRepository;
 import net.ezplanet.shopping.data.TrolleyRepository;
 import net.ezplanet.shopping.entity.Offer;
 import net.ezplanet.shopping.entity.Product;
+import net.ezplanet.shopping.entity.TrolleyItem;
+import net.ezplanet.shopping.util.Checkout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,9 @@ public class CheckoutController {
 
     @Autowired
     TrolleyRepository trolleyRepository;
+
+    @Autowired
+    Checkout checkout;
 
     @GetMapping("/echo_list")
     public String listItems (@RequestParam(value = "items") String items) {
@@ -127,5 +132,33 @@ public class CheckoutController {
 
         }
         return cartTotal;
+    }
+
+
+    @GetMapping(value = "/session")
+    public String checkoutItemsWithOffers(@RequestHeader(value="Trolley-Code") String trolleyCode,
+                                                     @RequestParam("items") List<String> items) {
+        System.out.println("Computing shopping cart total..." + trolleyCode);
+
+        TrolleyItem trolleyItem;
+
+        for (String item : items) {
+            item = item.toLowerCase();
+            Optional<TrolleyItem> optTrolley = trolleyRepository.findById(item); // returns java8 optional
+            if (optTrolley.isPresent()) {
+                trolleyItem = optTrolley.get();
+                System.out.println("TrolleyItem item: " + item + " quantity: " + trolleyItem.getQuantity());
+                trolleyItem.setQuantity(trolleyItem.getQuantity() + 1);
+                trolleyRepository.save(trolleyItem);
+            } else {
+                System.out.println("TrolleyItem item: " + item + " not found");
+                trolleyItem = new TrolleyItem(item, 1);
+            }
+            trolleyRepository.save(trolleyItem);
+        }
+
+        checkout.checkoutItems();
+        checkout.applyOffers();
+        return ("Checkout Total: " + checkout.getCheckoutTotal());
     }
 }

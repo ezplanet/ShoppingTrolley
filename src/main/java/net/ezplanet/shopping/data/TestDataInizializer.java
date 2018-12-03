@@ -48,8 +48,10 @@ public class TestDataInizializer implements ApplicationRunner {
         productRepository.save(new Product("apple", "A11", BigDecimal.valueOf(0.60)));
         productRepository.save(new Product("orange","A32", BigDecimal.valueOf(0.25)));
         productRepository.save(new Product("banana","A11", BigDecimal.valueOf(0.20)));
+        productRepository.save(new Product("melon", "B32", BigDecimal.valueOf(1.00)));
 
         offerRepository.save(new Offer("A11", 2, 1));
         offerRepository.save(new Offer("A32", 3, 1));
+        offerRepository.save(new Offer("B32", 3, 1));
     }
 }
