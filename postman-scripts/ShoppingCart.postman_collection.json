@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "c37b2f37-c2ab-410c-a8e7-75554b4fdaab",
+		"name": "ShoppingCart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ListProducts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/product/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"product",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ListOffers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/offer/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"offer",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddProduct",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/product/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"product",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckoutSimple",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/checkout/simple?items=Apple,Apple,Orange,Apple",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"checkout",
+						"simple"
+					],
+					"query": [
+						{
+							"key": "items",
+							"value": "Apple,Apple,Orange,Apple"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckoutSimpleOffers",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Trolley-Code",
+						"value": "112233"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/checkout/simple_offers?items=Apple,Apple,Orange,Apple,Orange, Banana,Orange",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"checkout",
+						"simple_offers"
+					],
+					"query": [
+						{
+							"key": "items",
+							"value": "Apple,Apple,Orange,Apple,Orange, Banana,Orange"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckoutSession",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Trolley-Code",
+						"value": "112233"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/checkout/simple_offers?items=Apple,Apple,Orange,Apple,Orange, Banana,Orange",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"checkout",
+						"simple_offers"
+					],
+					"query": [
+						{
+							"key": "items",
+							"value": "Apple,Apple,Orange,Apple,Orange, Banana,Orange"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClearTrolley",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
+				},
+				"url": {
+					"raw": "http://localhost:8080/offer/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"offer",
+						"list"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
