@@ -147,16 +147,16 @@ public class CheckoutController {
             Optional<TrolleyItem> optTrolley = trolleyRepository.findById(item); // returns java8 optional
             if (optTrolley.isPresent()) {
                 trolleyItem = optTrolley.get();
-                System.out.println("TrolleyItem item: " + item + " quantity: " + trolleyItem.getQuantity());
+                //System.out.println("TrolleyItem item: " + item + " quantity: " + trolleyItem.getQuantity());
                 trolleyItem.setQuantity(trolleyItem.getQuantity() + 1);
                 trolleyRepository.save(trolleyItem);
             } else {
-                System.out.println("TrolleyItem item: " + item + " not found");
+                //System.out.println("TrolleyItem item: " + item + " not found");
                 trolleyItem = new TrolleyItem(item, 1);
             }
+            System.out.println("Scanning trolley item: " + trolleyItem.getItem() + " - total quantity: " + trolleyItem.getQuantity());
             trolleyRepository.save(trolleyItem);
         }
-
         checkout.checkoutItems();
         checkout.applyOffers();
         return ("Checkout Total: " + checkout.getCheckoutTotal());

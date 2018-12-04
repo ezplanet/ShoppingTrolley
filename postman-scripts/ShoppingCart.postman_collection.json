@@ -167,7 +167,7 @@
 					"raw": "{\n\t\"name\": \"Banana\",\n\t\"offer\": 0,\n\t\"price\": .20\n}\n "
 				},
 				"url": {
-					"raw": "http://localhost:8080/checkout/simple_offers?items=Apple,Apple,Orange,Apple,Orange, Banana,Orange",
+					"raw": "http://localhost:8080/checkout/session?items=Apple,Apple,Orange,Apple,Orange,Banana,Orange,Melon,Melon,Melon",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -175,12 +175,12 @@
 					"port": "8080",
 					"path": [
 						"checkout",
-						"simple_offers"
+						"session"
 					],
 					"query": [
 						{
 							"key": "items",
-							"value": "Apple,Apple,Orange,Apple,Orange, Banana,Orange"
+							"value": "Apple,Apple,Orange,Apple,Orange,Banana,Orange,Melon,Melon,Melon"
 						}
 					]
 				}
