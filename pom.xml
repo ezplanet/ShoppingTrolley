@@ -24,7 +24,7 @@
         <java.version>1.8</java.version>
         <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
         <h2database.version>1.4.197</h2database.version>
-        <asserj.version>3.11.1</asserj.version>
+        <assertj.version>3.11.1</assertj.version>
         <mockito.version>2.24.0</mockito.version>
     </properties>
 
