@@ -16,7 +16,7 @@
  * Contributors:
  *     ...
  */
-package net.ezplanet.shopping.util;
+package net.ezplanet.shopping.service;
 
 import java.math.BigDecimal;
 

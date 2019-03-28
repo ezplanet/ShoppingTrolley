@@ -25,9 +25,6 @@ import java.math.BigDecimal;
 @Entity
 public class CheckoutItem {
 
-    //@Id
-    //private String id;
-
     @Id
     private String item;
 
@@ -42,22 +39,13 @@ public class CheckoutItem {
     public CheckoutItem() {}
 
     public CheckoutItem(String item, String offer, int quantity, int discount, BigDecimal price) {
-        //this.id       = id;
         this.item     = item;
         this.offer    = offer;
         this.quantity = quantity;
         this.discount = discount;
         this.price    = price;
     }
-/*
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-*/
     public String getItem() {
         return item;
     }

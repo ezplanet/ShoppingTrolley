@@ -22,6 +22,8 @@ package net.ezplanet.shopping.rest;
 import net.ezplanet.shopping.data.OfferRepository;
 import net.ezplanet.shopping.data.ProductRepository;
 import net.ezplanet.shopping.entity.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping (value = "/product")
 public class ProductController {
+    private static final Logger LOG = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
     ProductRepository productRepository;
@@ -40,7 +43,7 @@ public class ProductController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Product getProduct(@RequestParam(value = "name") String name) {
-        System.out.println("listing Products");
+        LOG.debug("listing Products");
 
         return productRepository.getOne(name);
     }
@@ -48,7 +51,7 @@ public class ProductController {
     @GetMapping(value = "/list",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Product> listProducts() {
-        System.out.println("listing rroducts");
+        LOG.debug("listing rroducts");
 
         return productRepository.findAll();
     }
@@ -57,7 +60,7 @@ public class ProductController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Product> updateProduct(@RequestBody Product product) {
-        System.out.println("add new product: " + product.getName());
+        LOG.debug("add new product: {}", product.getName());
 
         product.setName(product.getName().toLowerCase());
         productRepository.save(product);

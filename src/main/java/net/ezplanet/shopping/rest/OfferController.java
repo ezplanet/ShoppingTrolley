@@ -21,6 +21,8 @@ package net.ezplanet.shopping.rest;
 
 import net.ezplanet.shopping.data.OfferRepository;
 import net.ezplanet.shopping.entity.Offer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +32,14 @@ import java.util.List;
 @RestController
 @RequestMapping (value = "/offer")
 public class OfferController {
+    private static final Logger LOG = LoggerFactory.getLogger(OfferController.class);
 
     @Autowired
     OfferRepository offerRepository;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Offer getProduct(@RequestParam(value = "code") String code) {
-        System.out.println("get offer with code: " + code);
+        LOG.debug("get offer with code: {}", code);
 
         return offerRepository.getOne(code);
     }
@@ -44,7 +47,7 @@ public class OfferController {
     @GetMapping(value = "/list",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Offer> listOffers() {
-        System.out.println("listing offers");
+        LOG.debug("listing offers");
 
         return offerRepository.findAll();
     }
@@ -53,7 +56,7 @@ public class OfferController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Offer> updateProduct(@RequestBody Offer offer) {
-        System.out.println("add new offer: " + offer.getCode());
+        LOG.debug("add new offer: {}", offer.getCode());
 
         offerRepository.save(offer);
         return offerRepository.findAll();

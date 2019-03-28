@@ -18,14 +18,15 @@
  */
 package net.ezplanet.shopping.rest;
 
-
 import net.ezplanet.shopping.data.OfferRepository;
 import net.ezplanet.shopping.data.ProductRepository;
 import net.ezplanet.shopping.data.TrolleyRepository;
 import net.ezplanet.shopping.entity.Offer;
 import net.ezplanet.shopping.entity.Product;
 import net.ezplanet.shopping.entity.TrolleyItem;
-import net.ezplanet.shopping.util.Checkout;
+import net.ezplanet.shopping.service.Checkout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ import java.util.*;
 @RestController
 @RequestMapping (value = "/checkout")
 public class CheckoutController {
+    private static final Logger LOG = LoggerFactory.getLogger(CheckoutController.class);
 
     @Autowired
     ProductRepository productRepository;
@@ -52,7 +54,6 @@ public class CheckoutController {
 
     @GetMapping("/echo_list")
     public String listItems (@RequestParam(value = "items") String items) {
-        System.out.println("hello Mauro!");
         return "Items list: " + items;
     }
 
@@ -65,7 +66,7 @@ public class CheckoutController {
     @GetMapping(value = "/simple",
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public BigDecimal checkoutTotal(@RequestParam("items") List<String> items) {
-        System.out.println("Computing shopping cart total...");
+        LOG.debug("Computing shopping cart total...");
 
         BigDecimal cartTotal = BigDecimal.valueOf(0);
         BigDecimal price;
@@ -73,9 +74,9 @@ public class CheckoutController {
             try {
                 price = productRepository.getOne(item.toLowerCase()).getPrice();
                 cartTotal = cartTotal.add(price);
-                System.out.println("Item: " + item + " - Price: " + price.toString() + " - Cart Total: "  + cartTotal.toString());
-            } catch (Exception EntityNotFoundException) {
-                System.out.println("Item: " + item + " not available. Ignored.");
+                LOG.debug("Item: {} - Price: {} - Cart Total: {}", item, price, cartTotal);
+            } catch (EntityNotFoundException e) {
+                LOG.debug("Item: {} not available. Ignored.", item);
             }
         }
         return cartTotal;
@@ -85,11 +86,11 @@ public class CheckoutController {
     @GetMapping(value = "/simple_offers")
     public BigDecimal checkoutWithOffers(@RequestHeader(value="Trolley-Code") String trolleyCode,
                                          @RequestParam("items") List<String> items) {
-        System.out.println("Computing shopping cart total..." + trolleyCode);
+        LOG.debug("Computing shopping cart total...{}", trolleyCode);
 
         BigDecimal cartTotal = BigDecimal.valueOf(0);
         BigDecimal price;
-        Map<String, Integer> itemsMap = new HashMap<String, Integer>();
+        Map<String, Integer> itemsMap = new HashMap<>();
 
         for (String item : items) {
             try {
@@ -102,11 +103,11 @@ public class CheckoutController {
                 itemsMap.put(item.toLowerCase(), Integer.valueOf(count));
                 price = productRepository.getOne(item.toLowerCase()).getPrice();
                 cartTotal = cartTotal.add(price);
-                System.out.println("Item: " + item + " - Price: " + price + " - Cart Total: "  + cartTotal);
+                LOG.debug("Item: {} - Price: {} - Cart Total: {}", item, price, cartTotal);
             } catch (EntityNotFoundException e) {
-                System.out.println("Item: " + item + " not available. Ignored.");
+                LOG.debug("Item: {} not available. Ignored.", item);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error("Exception: {} - Cause: {}", e.getMessage(), e.getCause().getMessage());
             }
         }
         Iterator it = itemsMap.entrySet().iterator();
@@ -116,18 +117,18 @@ public class CheckoutController {
         int discount;
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            System.out.println("Total " + pair.getKey() + "s = " + pair.getValue());
+            LOG.debug("Total {} s = {}", pair.getKey(), pair.getValue());
             try {
                 product = productRepository.getOne(pair.getKey().toString());
                 offer = offerRepository.getOne(product.getOffer());
                 discount = ((int) pair.getValue() / offer.getThreshold()) * offer.getFree();
-                System.out.println("Product: " + product.getName() + " - Discount: " + discount);
+                LOG.debug("Product: {} - Discount: {}", product.getName(), discount);
                 price = product.getPrice();
                 cartTotal = cartTotal.subtract(price.multiply(BigDecimal.valueOf(discount)));
-                System.out.println("Product: " + product.getName() + " - Price: " + price + " - Cart Total: "  + cartTotal);
+                LOG.debug("Product: {} - Price: {} - Cart Total: {}", product.getName(), price, cartTotal);
 
             } catch (EntityNotFoundException e) {
-                System.out.println("Product: " + pair.getKey().toString() + " no offer available.");
+                LOG.debug("Product: {} no offer available.", pair.getKey());
             }
 
         }
@@ -138,7 +139,7 @@ public class CheckoutController {
     @GetMapping(value = "/session")
     public String checkoutItemsWithOffers(@RequestHeader(value="Trolley-Code") String trolleyCode,
                                                      @RequestParam("items") List<String> items) {
-        System.out.println("Computing shopping cart total..." + trolleyCode);
+        LOG.debug("Computing shopping cart total... {}", trolleyCode);
 
         TrolleyItem trolleyItem;
 
@@ -147,14 +148,14 @@ public class CheckoutController {
             Optional<TrolleyItem> optTrolley = trolleyRepository.findById(item); // returns java8 optional
             if (optTrolley.isPresent()) {
                 trolleyItem = optTrolley.get();
-                //System.out.println("TrolleyItem item: " + item + " quantity: " + trolleyItem.getQuantity());
+                LOG.trace("TrolleyItem item: {} - quantity: {}", item, trolleyItem.getQuantity());
                 trolleyItem.setQuantity(trolleyItem.getQuantity() + 1);
                 trolleyRepository.save(trolleyItem);
             } else {
-                //System.out.println("TrolleyItem item: " + item + " not found");
+                LOG.trace("TrolleyItem item: {} not found", item);
                 trolleyItem = new TrolleyItem(item, 1);
             }
-            System.out.println("Scanning trolley item: " + trolleyItem.getItem() + " - total quantity: " + trolleyItem.getQuantity());
+            LOG.debug("Scanning trolley item: {} - total quantity: {}", trolleyItem.getItem(), trolleyItem.getQuantity());
             trolleyRepository.save(trolleyItem);
         }
         checkout.checkoutItems();

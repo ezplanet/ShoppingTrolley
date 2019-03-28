@@ -28,7 +28,7 @@
  * @version 1.0
  * @since   2018-12-03
  */
-package net.ezplanet.shopping.util;
+package net.ezplanet.shopping.service;
 
 import net.ezplanet.shopping.data.CheckoutRepository;
 import net.ezplanet.shopping.data.OfferRepository;
@@ -38,16 +38,18 @@ import net.ezplanet.shopping.entity.CheckoutItem;
 import net.ezplanet.shopping.entity.Offer;
 import net.ezplanet.shopping.entity.Product;
 import net.ezplanet.shopping.entity.TrolleyItem;
+import net.ezplanet.shopping.rest.CheckoutController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static java.lang.Math.abs;
-
 @Service
 public class CheckoutTrolley implements Checkout {
+    private static final Logger LOG = LoggerFactory.getLogger(CheckoutController.class);
 
     @Autowired
     ProductRepository productRepository;
@@ -74,7 +76,7 @@ public class CheckoutTrolley implements Checkout {
         Product product;
 
         List<TrolleyItem> trolleyItem = trolleyRepository.findAllOrderByOfferPriceAsc();
-        System.out.println("=== Checkout ITEMS List ====");
+        LOG.debug("=== Checkout ITEMS List ====");
         for (TrolleyItem item : trolleyItem) {
             Optional<Product> optionalProduct = productRepository.findById(item.getItem());
             if (optionalProduct.isPresent()) {
@@ -82,13 +84,12 @@ public class CheckoutTrolley implements Checkout {
                 checkoutRepository.save(new CheckoutItem(item.getItem(),
                         product.getOffer(), item.getQuantity(), 0, product.getPrice()));
 
-                System.out.println("Item: " + item.getItem() + " - Offer: " + product.getOffer() +
-                        " - Quantity: " + item.getQuantity() + " - Price: " + product.getPrice());
-
+                LOG.debug("Item: {} - Offer: {} - Quantity: {} - Price: {}", item.getItem(), product.getOffer(),
+                        item.getQuantity(), product.getPrice());
             }
 
         }
-        System.out.println("============================");
+        LOG.debug("============================");
     }
 
     /**
@@ -104,17 +105,17 @@ public class CheckoutTrolley implements Checkout {
         List<Offer> offers = offerRepository.findAll();
         int totalQuantity;
         int discount;
-        System.out.println("=== Applying offers ====");
+        LOG.debug("=== Applying offers ====");
         for (Offer offer : offers) {
             List<CheckoutItem> checkoutItems = checkoutRepository.findByOfferOrderOfferPriceAsc(offer.getCode());
             totalQuantity = 0;
             for (CheckoutItem checkoutItem: checkoutItems) {
-                System.out.println("Item: " + checkoutItem.getItem() + " - Offer: " + checkoutItem.getOffer() +
-                        " - Quantity: " + checkoutItem.getQuantity());
+                LOG.debug("Item: {} - Offer: {} - Quantity: {}", checkoutItem.getItem(),
+                        checkoutItem.getOffer(), checkoutItem.getQuantity());
                 totalQuantity = totalQuantity + checkoutItem.getQuantity();
             }
             discount = (totalQuantity / offer.getThreshold()) * offer.getFree();
-            //System.out.println("Offer: " + offer.getCode() + " - Discount: " + discount);
+            LOG.trace("Offer: {} - Discount: {}", offer.getCode(), discount);
             for (CheckoutItem checkoutItem: checkoutItems) {
                 if (checkoutItem.getQuantity() < discount) {
                     checkoutItem.setDiscount(checkoutItem.getQuantity());
@@ -129,7 +130,7 @@ public class CheckoutTrolley implements Checkout {
                 if (discount <= 0) break;
             }
         }
-        System.out.println("========================");
+        LOG.debug("========================");
 
     }
 
@@ -144,16 +145,16 @@ public class CheckoutTrolley implements Checkout {
 
         BigDecimal checkoutTotal = BigDecimal.valueOf(0);
 
-        System.out.println("=== Checkout TOTAL ====");
+        LOG.debug("=== Checkout TOTAL ====");
         List<CheckoutItem> checkoutItems = checkoutRepository.findAll();
         for (CheckoutItem checkoutItem: checkoutItems) {
-            System.out.println("Item: " + checkoutItem.getItem() + " - Offer: " + checkoutItem.getOffer() +
-                    " - Quantity: " + checkoutItem.getQuantity() + " - Discount: " + checkoutItem.getDiscount());
+            LOG.debug("Item: {} - Offer: {} - Quantity: {} - Discount: {}", checkoutItem.getItem(),
+                    checkoutItem.getOffer(), checkoutItem.getQuantity(), checkoutItem.getDiscount());
 
             checkoutTotal = checkoutTotal.add(BigDecimal.valueOf
-                    (checkoutItem.getQuantity() - checkoutItem.getDiscount()).multiply(checkoutItem.getPrice()));
+                    ((long) checkoutItem.getQuantity() - checkoutItem.getDiscount()).multiply(checkoutItem.getPrice()));
         }
-        System.out.println("============================");
+        LOG.debug("============================");
         // Empties the checkout area (repository), ready for the next checkout request.
         checkoutRepository.deleteAll();
         return checkoutTotal;
